@@ -37,7 +37,7 @@ function captureFunction($name = '')
     $function[] = $name;
 }
 
-function add_semicolon($str) {
+function addSemicolon($str) {
     // 不全 单行 大括号
     $token = token_get_all($str);
     $has = array();
@@ -165,7 +165,7 @@ function arrayWarp($k, $token) {
 }
 
 
-$str = add_semicolon($str);
+$str = addSemicolon($str);
 
 $token = token_get_all($str);
 
@@ -221,6 +221,7 @@ $switchStartInd = 0;
 $indentationNum = 0;
 
 foreach ($token as $k => $v) {
+    var_dump($v);
 
     if ($theBankToken == 'use' && is_string($v) && in_array($v, $wrapB)) {
         $theBankToken = '';
@@ -364,6 +365,10 @@ foreach ($token as $k => $v) {
                 }
                 if (is_array($token[$k + 1]) && $token[$k + 1][0] == 329) {
                     $data .= $v . PHP_EOL;
+                } elseif ($theBankToken == 'case' && $token[$k + 1][0] != 370) {
+                    // 如果遇到为case 的情况 后面的需要换行
+                    // 不能让case 后面的注释换行
+                    $data .= $v . PHP_EOL; 
                 } else {
                     $data .= ' ' . $v . ' ';
                 }
@@ -607,6 +612,11 @@ foreach ($token as $k => $v) {
             break;
 
         case '370': //单行注释 /* */
+
+            if ($theBankToken != $v[1] && $line == $v[2]) {
+                $data .= $v[1];
+                break;
+            }
             
             if (!is_array($token[$k - 1]) || $token[$k - 1][0] != $v[0]) {
                 $data .= PHP_EOL;
@@ -634,6 +644,12 @@ foreach ($token as $k => $v) {
             break;
         case '283': // ==
         case '278': // ||
+            $data .= ' ' . $v[1] . ' ';
+            break;
+        case '279' : // &&
+            $data .= ' ' . $v[1] . ' ';
+            break;
+        case '273' : // ./
             $data .= ' ' . $v[1] . ' ';
             break;
         case '362': //array
