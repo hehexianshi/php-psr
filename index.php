@@ -37,13 +37,13 @@ function captureFunction($name = '')
     $function[] = $name;
 }
 
-function addSemicolon($str) {
+function addSemicolon($str, $type = 301) {
     // 不全 单行 大括号
     $token = token_get_all($str);
     $has = array();
     $rhas = array();
     foreach ($token as $k => $v) {
-        if(is_array($v) && $v[0] == 301) {
+        if(is_array($v) && $v[0] == $type) {
             $i = 0;
             $s = 0;
             $t = 0;
@@ -95,7 +95,7 @@ function addSemicolon($str) {
                 }
 
 
-                preg_match('/^if(.*?)#\$REPLACE_POINT\$#/', $olddStr, $matches);
+                preg_match('/^'.$v[1].'(.*?)#\$REPLACE_POINT\$#/', $olddStr, $matches);
                 $matches[0] = str_replace('#$REPLACE_POINT$#', '', $matches[0]);
                 $matches[0] .= ')';
 
@@ -166,6 +166,7 @@ function arrayWarp($k, $token) {
 
 
 $str = addSemicolon($str);
+$str = addSemicolon($str, 302);
 
 $token = token_get_all($str);
 
@@ -219,6 +220,8 @@ $switchStart = 0;
 $switchStartInd = 0;
 // 代码需要缩进的个数
 $indentationNum = 0;
+// && 需要换行时 
+$andStart = 0;
 
 foreach ($token as $k => $v) {
 
@@ -434,7 +437,12 @@ foreach ($token as $k => $v) {
 
     // 记录行首token
     if ($line < $v[2]) {
-        $r = str_repeat('    ', $indentationNum);
+
+        if ($andStart) {
+            $andStart = 0;
+        } else {
+            $r = str_repeat('    ', $indentationNum);
+        }
     } else {
         $r = '';
     }
@@ -613,6 +621,11 @@ foreach ($token as $k => $v) {
         case '370': //单行注释 /* */
 
             if ($theBankToken != $v[1] && $line == $v[2]) {
+                // 如果是数组中 并且为splitArray模式的
+                if ($splitArray) {
+                    $data .= $v[1] . str_repeat('    ', $indentationNum + $bracketsCount);
+                    break;
+                }
                 $data .= $v[1];
                 break;
             }
@@ -646,7 +659,19 @@ foreach ($token as $k => $v) {
             $data .= ' ' . $v[1] . ' ';
             break;
         case '279' : // &&
-            $data .= ' ' . $v[1] . ' ';
+
+            // 判断 && 下一个token 是不是新行
+            if (is_array($token[$k + 1]) && $line < $token[$k + 1][2]) {
+                $data .= PHP_EOL;
+                $data .= str_repeat('    ', $indentationNum + 1);
+                $data .= $v[1];
+                $data .= ' ';
+                $andStart = 1;
+
+            } else {
+                $data .= ' ' . $v[1] . ' ';
+
+            }
             break;
         case '273' : // ./
             $data .= ' ' . $v[1] . ' ';
