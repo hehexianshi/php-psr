@@ -399,22 +399,21 @@ foreach ($token as $k => $v) {
                 $data .= ' ' . $v . ' ';
                 break;
             /*
-             * $a = $b, $b == $c, $b === $c, $b >= $c, $v <= $c
+             * $a = $b, $b === $c, $v <= $c
              *
              */
             case '>':
             case '<':
             case '=':
-            case '==':
             case '===':
             case '!=':
-            case '>=':
             case '<=':
             case '<==':
             case '>==':
             case '?':
             case ':':
             case '|':
+            case '.':
                 $data .= ' ' . $v . ' ';
                 break;
             case '"':
@@ -655,6 +654,7 @@ foreach ($token as $k => $v) {
             $data .= PHP_EOL . $r . $v[1] . ' ';
             break;
         case '283': // ==
+        case '284': // >=
         case '278': // ||
             $data .= ' ' . $v[1] . ' ';
             break;
