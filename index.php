@@ -221,7 +221,6 @@ $switchStartInd = 0;
 $indentationNum = 0;
 
 foreach ($token as $k => $v) {
-    var_dump($v);
 
     if ($theBankToken == 'use' && is_string($v) && in_array($v, $wrapB)) {
         $theBankToken = '';
