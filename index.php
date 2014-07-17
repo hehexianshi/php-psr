@@ -470,6 +470,12 @@ foreach ($token as $k => $v) {
             $data .= $r . $v[1];
             break;
         case '309': //变量
+            // 当为sql 的时候 变量 会和 上一个token 不在一行 
+            if (is_string($token[$k - 1]) && $token[$k -1] == '.') {
+                $data .= $v[1];
+                break; 
+            }
+
             $data .= $r . $v[1];
             break;
         case '334': //function
@@ -576,6 +582,11 @@ foreach ($token as $k => $v) {
             $data .= $v[1] . ' ';
             break;
         case '307':
+            if (is_string($token[$k - 1]) && $token[$k - 1] == '.') {
+                $data .= $v[1];
+                break;
+            }
+
 
             if (is_array($token[$k + 1]) && $token[$k + 1][0] == 309 && in_array($v[1], $ContentTable)) {
                 //like this : function demo(int $a){} 
