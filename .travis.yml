@@ -3,7 +3,7 @@ php:
  - 5.3
 before_script: chmod +x index.php
 
-script: index.php test/1.php test/1.test.php 
+script: ./index.php test/1.php test/1.test.php 
 
 email:
   - hehexianshi@126.com
