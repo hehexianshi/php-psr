@@ -1,0 +1,10 @@
+language: php
+php:
+ - 5.3
+before_script: chmod +x index.php
+
+script: index.php test/1.php test/1.test.php 
+
+notifications:
+email:
+  - zhubaiying@126.com
