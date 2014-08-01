@@ -1,5 +1,6 @@
 php-psr
 =======
+[![Build Status](https://travis-ci.org/hehexianshi/php-psr.svg?branch=master)](https://travis-ci.org/hehexianshi/php-psr)
 
 按照标准生成php文件
 
